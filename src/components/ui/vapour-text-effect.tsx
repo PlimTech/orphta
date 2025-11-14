@@ -125,7 +125,7 @@ export default function VaporizeTextCycle({
     } catch {
       return texts && texts.length ? [...texts] : ["Orphta"]
     }
-  }, [textsKey])
+  }, [textsKey, texts])
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const containerRef = useRef<HTMLDivElement>(null)
   const [currentIndex, setCurrentIndex] = useState(0)

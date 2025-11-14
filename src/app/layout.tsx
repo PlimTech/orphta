@@ -38,7 +38,6 @@ export default function RootLayout({
           <div className="pointer-events-none fixed inset-0 -z-10">
             <div className="absolute inset-0 bg-gradient-to-b from-zinc-900 via-zinc-950 to-black" />
             <div className="absolute inset-0 mix-blend-screen opacity-60">
-              {/* @ts-expect-error - loaded client-side only */}
               <WebGLShader />
             </div>
           </div>
