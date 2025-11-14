@@ -1,24 +1,24 @@
 "use client"
 
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { useEffect, useRef } from "react"
-import type * as THREEType from "three"
 
 declare global {
   interface Window {
-    THREE: typeof import("three") | undefined
+    THREE: any
   }
 }
 
 export function ShaderAnimation() {
   const containerRef = useRef<HTMLDivElement>(null)
   const sceneRef = useRef<{
-    camera: THREEType.Camera | null
-    scene: THREEType.Scene | null
-    renderer: THREEType.WebGLRenderer | null
+    camera: any | null
+    scene: any | null
+    renderer: any | null
     uniforms:
       | {
           time: { type: string; value: number }
-          resolution: { type: string; value: THREEType.Vector2 }
+          resolution: { type: string; value: any }
         }
       | null
     animationId: number | null
