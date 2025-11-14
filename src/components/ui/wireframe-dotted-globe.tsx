@@ -508,6 +508,11 @@ export default function RotatingEarthShopifyStyle({
     // Block wheel to avoid page/browser zoom while cursor over canvas
     const wheelBlocker = (e: WheelEvent) => e.preventDefault()
     canvas.addEventListener("wheel", wheelBlocker, { passive: false })
+    // Block Safari pinch-zoom gestures while interacting with the canvas
+    const gestureBlocker = (e: Event) => e.preventDefault()
+    ;(canvas as any).addEventListener("gesturestart", gestureBlocker, { passive: false })
+    ;(canvas as any).addEventListener("gesturechange", gestureBlocker, { passive: false })
+    ;(canvas as any).addEventListener("gestureend", gestureBlocker, { passive: false })
     // Zoom disabled by request; keep only drag to rotate
     canvas.addEventListener("mouseleave", () => {
       // if mouse leaves canvas, ensure rotation resumes after a short delay
@@ -520,6 +525,9 @@ export default function RotatingEarthShopifyStyle({
       rotationTimer.stop()
       canvas.removeEventListener("mousedown", handleMouseDown)
       canvas.removeEventListener("wheel", wheelBlocker as EventListener)
+      ;(canvas as any).removeEventListener("gesturestart", gestureBlocker as EventListener)
+      ;(canvas as any).removeEventListener("gesturechange", gestureBlocker as EventListener)
+      ;(canvas as any).removeEventListener("gestureend", gestureBlocker as EventListener)
     }
   }, [width, height])
 
@@ -532,11 +540,11 @@ export default function RotatingEarthShopifyStyle({
   }
 
   return (
-    <div className={className}>
+    <div className={className} style={{ overscrollBehavior: "contain" }}>
       <canvas
         ref={canvasRef}
         className="h-auto w-full"
-        style={{ maxWidth: "100%", height: "auto", display: "block" }}
+        style={{ maxWidth: "100%", height: "auto", display: "block", touchAction: "none" }}
       />
       <div className="pointer-events-none absolute inset-x-0 bottom-10 flex justify-center">
         <span className="rounded-full bg-black/40 px-3 py-1 text-[10px] uppercase tracking-[0.3em] text-emerald-200/70 backdrop-blur-sm">
