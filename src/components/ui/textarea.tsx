@@ -13,10 +13,10 @@ const Textarea = React.forwardRef<HTMLTextAreaElement, TextareaProps>(({ classNa
   const mouseX = useMotionValue(0)
   const mouseY = useMotionValue(0)
 
-  function handleMouseMove({ currentTarget, clientX, clientY }: any) {
-    const { left, top } = currentTarget.getBoundingClientRect()
-    mouseX.set(clientX - left)
-    mouseY.set(clientY - top)
+  function handleMouseMove(e: React.MouseEvent<HTMLDivElement>) {
+    const rect = e.currentTarget.getBoundingClientRect()
+    mouseX.set(e.clientX - rect.left)
+    mouseY.set(e.clientY - rect.top)
   }
 
   return (

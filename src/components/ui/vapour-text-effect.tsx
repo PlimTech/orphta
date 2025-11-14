@@ -319,7 +319,6 @@ export default function VaporizeTextCycle({
     lineHeight: typography.lineHeight,
   }
 
-  const maskDirection = direction === "left-to-right" ? "to right" : "to left"
   const maskPercent = Math.round(vaporProgress * 1000) / 10 // 1 decimal precision
   const nextOpacity = phase === "vapor" ? Math.min(1, 0.15 + vaporProgress * 0.85) : phase === "fade" ? fadeProgress : 1
 

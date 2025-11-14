@@ -510,9 +510,12 @@ export default function RotatingEarthShopifyStyle({
     canvas.addEventListener("wheel", wheelBlocker, { passive: false })
     // Block Safari pinch-zoom gestures while interacting with the canvas
     const gestureBlocker = (e: Event) => e.preventDefault()
-    ;(canvas as any).addEventListener("gesturestart", gestureBlocker, { passive: false })
-    ;(canvas as any).addEventListener("gesturechange", gestureBlocker, { passive: false })
-    ;(canvas as any).addEventListener("gestureend", gestureBlocker, { passive: false })
+    // @ts-expect-error - gesture events are Safari-specific and not in lib.dom
+    canvas.addEventListener("gesturestart", gestureBlocker as EventListener, { passive: false })
+    // @ts-expect-error - gesture events are Safari-specific and not in lib.dom
+    canvas.addEventListener("gesturechange", gestureBlocker as EventListener, { passive: false })
+    // @ts-expect-error - gesture events are Safari-specific and not in lib.dom
+    canvas.addEventListener("gestureend", gestureBlocker as EventListener, { passive: false })
     // Zoom disabled by request; keep only drag to rotate
     canvas.addEventListener("mouseleave", () => {
       // if mouse leaves canvas, ensure rotation resumes after a short delay
@@ -525,9 +528,12 @@ export default function RotatingEarthShopifyStyle({
       rotationTimer.stop()
       canvas.removeEventListener("mousedown", handleMouseDown)
       canvas.removeEventListener("wheel", wheelBlocker as EventListener)
-      ;(canvas as any).removeEventListener("gesturestart", gestureBlocker as EventListener)
-      ;(canvas as any).removeEventListener("gesturechange", gestureBlocker as EventListener)
-      ;(canvas as any).removeEventListener("gestureend", gestureBlocker as EventListener)
+      // @ts-expect-error - gesture events are Safari-specific and not in lib.dom
+      canvas.removeEventListener("gesturestart", gestureBlocker as EventListener)
+      // @ts-expect-error - gesture events are Safari-specific and not in lib.dom
+      canvas.removeEventListener("gesturechange", gestureBlocker as EventListener)
+      // @ts-expect-error - gesture events are Safari-specific and not in lib.dom
+      canvas.removeEventListener("gestureend", gestureBlocker as EventListener)
     }
   }, [width, height])
 

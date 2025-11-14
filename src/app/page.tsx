@@ -9,7 +9,7 @@ import { ShaderAnimation } from "@/components/ui/shader-lines"
 import RotatingEarth from "@/components/ui/wireframe-dotted-globe"
 // Replace animated H2 titles with particle headings
 import { ParticleHeading } from "@/components/ui/particle-heading"
-import { LiquidButton, MetalButton } from "@/components/ui/liquid-glass-button"
+// import { LiquidButton, MetalButton } from "@/components/ui/liquid-glass-button"
 import { RainbowButton } from "@/components/ui/rainbow-button"
 import { Timeline } from "@/components/ui/timeline"
 import { Input } from "@/components/ui/input"

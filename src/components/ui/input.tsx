@@ -5,7 +5,7 @@ import { motion, useMotionTemplate, useMotionValue } from "framer-motion"
 
 import { cn } from "@/lib/utils"
 
-export interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {}
+export type InputProps = React.InputHTMLAttributes<HTMLInputElement>
 
 const Input = React.forwardRef<HTMLInputElement, InputProps>(({ className, type, ...props }, ref) => {
   const radius = 120 // hover glow radius
@@ -14,10 +14,10 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(({ className, type,
   const mouseX = useMotionValue(0)
   const mouseY = useMotionValue(0)
 
-  function handleMouseMove({ currentTarget, clientX, clientY }: any) {
-    const { left, top } = currentTarget.getBoundingClientRect()
-    mouseX.set(clientX - left)
-    mouseY.set(clientY - top)
+  function handleMouseMove(e: React.MouseEvent<HTMLDivElement>) {
+    const rect = e.currentTarget.getBoundingClientRect()
+    mouseX.set(e.clientX - rect.left)
+    mouseY.set(e.clientY - rect.top)
   }
 
   return (
