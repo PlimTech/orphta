@@ -1,4 +1,5 @@
 "use client"
+/* eslint-disable @typescript-eslint/no-explicit-any */
 
 import { useEffect, useRef } from "react"
 import * as THREE from "three"
@@ -6,10 +7,10 @@ import * as THREE from "three"
 export function WebGLShader() {
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const sceneRef = useRef<{
-    scene: THREE.Scene | null
-    camera: THREE.OrthographicCamera | null
-    renderer: THREE.WebGLRenderer | null
-    mesh: THREE.Mesh<THREE.BufferGeometry, THREE.Material | THREE.Material[]> | null
+    scene: any | null
+    camera: any | null
+    renderer: any | null
+    mesh: any | null
     uniforms:
       | {
           resolution: { value: [number, number] }
