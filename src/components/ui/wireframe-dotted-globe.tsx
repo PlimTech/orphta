@@ -461,7 +461,7 @@ export default function RotatingEarthShopifyStyle({
     let autoRotate = true
     const rotationSpeed = 0.065
 
-    const rotationTimer = d3.timer((elapsed) => {
+    const rotationTimer = d3.timer((elapsed: number) => {
       currentTimestamp = elapsed
       currentTimeSeconds = elapsed / 1000
       if (autoRotate) {
@@ -510,11 +510,9 @@ export default function RotatingEarthShopifyStyle({
     canvas.addEventListener("wheel", wheelBlocker, { passive: false })
     // Block Safari pinch-zoom gestures while interacting with the canvas
     const gestureBlocker = (e: Event) => e.preventDefault()
-    // @ts-expect-error - gesture events are Safari-specific and not in lib.dom
+    // Safari-specific gesture events
     canvas.addEventListener("gesturestart", gestureBlocker as EventListener, { passive: false })
-    // @ts-expect-error - gesture events are Safari-specific and not in lib.dom
     canvas.addEventListener("gesturechange", gestureBlocker as EventListener, { passive: false })
-    // @ts-expect-error - gesture events are Safari-specific and not in lib.dom
     canvas.addEventListener("gestureend", gestureBlocker as EventListener, { passive: false })
     // Zoom disabled by request; keep only drag to rotate
     canvas.addEventListener("mouseleave", () => {
@@ -528,11 +526,9 @@ export default function RotatingEarthShopifyStyle({
       rotationTimer.stop()
       canvas.removeEventListener("mousedown", handleMouseDown)
       canvas.removeEventListener("wheel", wheelBlocker as EventListener)
-      // @ts-expect-error - gesture events are Safari-specific and not in lib.dom
+      // Safari-specific gesture events
       canvas.removeEventListener("gesturestart", gestureBlocker as EventListener)
-      // @ts-expect-error - gesture events are Safari-specific and not in lib.dom
       canvas.removeEventListener("gesturechange", gestureBlocker as EventListener)
-      // @ts-expect-error - gesture events are Safari-specific and not in lib.dom
       canvas.removeEventListener("gestureend", gestureBlocker as EventListener)
     }
   }, [width, height])

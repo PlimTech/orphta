@@ -24,8 +24,7 @@ const config: Config = {
         "color-3": "hsl(var(--color-3))",
         "color-4": "hsl(var(--color-4))",
         "color-5": "hsl(var(--color-5))",
-      },
-      colors: {
+        // design tokens
         border: "var(--border)",
         input: "var(--input)",
         ring: "var(--ring)",

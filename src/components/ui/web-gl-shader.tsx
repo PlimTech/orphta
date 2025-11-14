@@ -6,10 +6,10 @@ import * as THREE from "three"
 export function WebGLShader() {
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const sceneRef = useRef<{
-    scene: any | null
-    camera: any | null
-    renderer: any | null
-    mesh: any | null
+    scene: THREE.Scene | null
+    camera: THREE.OrthographicCamera | null
+    renderer: THREE.WebGLRenderer | null
+    mesh: THREE.Mesh<THREE.BufferGeometry, THREE.Material | THREE.Material[]> | null
     uniforms:
       | {
           resolution: { value: [number, number] }
@@ -134,9 +134,15 @@ export function WebGLShader() {
       window.removeEventListener("resize", handleResize)
       if (refs.mesh) {
         refs.scene?.remove(refs.mesh)
-        ;(refs.mesh.geometry as any)?.dispose?.()
-        const mat = refs.mesh.material as any
-        if (mat && typeof mat.dispose === "function") mat.dispose()
+        // dispose geometry
+        refs.mesh.geometry.dispose()
+        // dispose material(s)
+        const mat = refs.mesh.material
+        if (Array.isArray(mat)) {
+          mat.forEach((m) => m.dispose())
+        } else {
+          mat.dispose()
+        }
       }
       refs.renderer?.dispose()
     }
