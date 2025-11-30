@@ -401,7 +401,7 @@ export default function Home() {
               </Link>
             ))}
             <p className="text-sm text-white/70">
-              Escritório-base em São Paulo com operações remotas sincronizadas com fusos das Américas e Europa.
+              Escritório-base em Brasília com operações remotas sincronizadas com fusos das Américas e Europa.
             </p>
           </div>
         </div>
