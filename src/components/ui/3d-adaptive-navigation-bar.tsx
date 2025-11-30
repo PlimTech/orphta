@@ -24,12 +24,28 @@ export const PillBase: React.FC = () => {
   const [expanded, setExpanded] = useState(false)
   const [hovering, setHovering] = useState(false)
   const [isTransitioning, setIsTransitioning] = useState(false)
+  const [isMobile, setIsMobile] = useState(false)
+   // toggle menu for mobile users
+  const [menuOpen, setMenuOpen] = useState(false)
   const hoverTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
   const pillWidth = useSpring(220, { stiffness: 220, damping: 25, mass: 1 })
   const pillShift = useSpring(0, { stiffness: 220, damping: 25, mass: 1 })
 
   useEffect(() => {
+    const update = () => setIsMobile(window.innerWidth <= 768)
+    update()
+    window.addEventListener("resize", update)
+    return () => window.removeEventListener("resize", update)
+  }, [])
+
+  useEffect(() => {
+    if (isMobile) {
+      setExpanded(false)
+      setMenuOpen(false)
+      pillWidth.set(200)
+      return
+    }
     if (hovering) {
       setExpanded(true)
       pillWidth.set(640)
@@ -44,7 +60,7 @@ export const PillBase: React.FC = () => {
     return () => {
       if (hoverTimeoutRef.current) clearTimeout(hoverTimeoutRef.current)
     }
-  }, [hovering, pillWidth])
+  }, [hovering, pillWidth, isMobile])
 
   useEffect(() => {
     const handleScroll = () => {
@@ -67,8 +83,14 @@ export const PillBase: React.FC = () => {
     return () => window.removeEventListener("scroll", handleScroll)
   }, [])
 
-  const handleMouseEnter = () => setHovering(true)
-  const handleMouseLeave = () => setHovering(false)
+  const handleMouseEnter = () => {
+    if (isMobile) return
+    setHovering(true)
+  }
+  const handleMouseLeave = () => {
+    if (isMobile) return
+    setHovering(false)
+  }
 
   const handleSectionClick = (sectionId: string) => {
     setIsTransitioning(true)
@@ -87,6 +109,41 @@ export const PillBase: React.FC = () => {
 
   const activeItem = NAV_ITEMS.find((item) => item.id === activeSection)
 
+  if (isMobile) {
+    return (
+      <div className="relative w-full">
+        <button
+          onClick={() => setMenuOpen((prev) => !prev)}
+          className="flex w-full items-center justify-between rounded-full border border-white/20 bg-black/50 px-4 py-3 text-sm font-semibold uppercase tracking-[0.25em] text-white/80 shadow-[0_15px_40px_rgba(0,0,0,0.35)]"
+        >
+          <span>{activeItem?.label ?? "Home"}</span>
+          <span className="text-[11px] text-white/60">{menuOpen ? "Fechar" : "Menu"}</span>
+        </button>
+        {menuOpen && (
+          <div className="absolute left-0 right-0 mt-2 rounded-2xl border border-white/15 bg-black/70 p-2 backdrop-blur-xl shadow-[0_20px_60px_rgba(0,0,0,0.5)]">
+            <ul className="space-y-1 text-sm text-white/80">
+              {NAV_ITEMS.map((item) => (
+                <li key={item.id}>
+                  <button
+                    onClick={() => handleSectionClick(item.id)}
+                    className={`flex w-full items-center justify-between rounded-xl px-3 py-2 transition ${
+                      item.id === activeSection
+                        ? "bg-white/10 text-white"
+                        : "bg-transparent hover:bg-white/5"
+                    }`}
+                  >
+                    <span className="uppercase tracking-[0.2em]">{item.label}</span>
+                    {item.id === activeSection && <span className="h-2 w-2 rounded-full bg-emerald-400" />}
+                  </button>
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
+      </div>
+    )
+  }
+
   return (
     <motion.nav
       onMouseEnter={handleMouseEnter}
@@ -94,7 +151,7 @@ export const PillBase: React.FC = () => {
       className="relative rounded-full"
       style={{
         width: pillWidth,
-        height: "64px",
+        height: isMobile ? "56px" : "64px",
         // Base surface + subtle rainbow border to match RainbowButton
         background: `
           linear-gradient(135deg, rgba(10,12,20,0.92), rgba(8,10,18,0.92)) padding-box,

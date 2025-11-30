@@ -1,8 +1,8 @@
 "use client"
 
 import Link from "next/link"
-import { useCallback } from "react"
-import { ArrowUpRight, Mail, Phone } from "lucide-react"
+import { useCallback, useEffect, useState } from "react"
+import { ArrowUpRight, Mail, Phone, Globe2, Boxes, ServerCog } from "lucide-react"
 
 import { PillBase } from "@/components/ui/3d-adaptive-navigation-bar"
 import { ShaderAnimation } from "@/components/ui/shader-lines"
@@ -23,18 +23,21 @@ const services = [
     description:
       "Arquitetamos plataformas que nascem escaláveis, com observabilidade e feature flags prontos para squads globais.",
     detail: "12 plataformas lançadas desde 2022",
+    icon: Globe2,
   },
   {
     title: "Produtos para corporações",
     description:
       "Criamos hubs digitais que conversam com legados complexos e traduzem processos em experiências intuitivas.",
     detail: "+48 integrações críticas mapeadas",
+    icon: Boxes,
   },
   {
     title: "Interfaces operacionais",
     description:
       "Dashboards e command centers com métricas em tempo real, focados em tomada de decisão e automação.",
     detail: "SLAs visíveis em menos de 4 semanas",
+    icon: ServerCog,
   },
 ]
 
@@ -137,78 +140,141 @@ export default function Home() {
     const target = document.getElementById("contact")
     target?.scrollIntoView({ behavior: "smooth", block: "start" })
   }, [])
+  const [isMobile, setIsMobile] = useState(false)
+  const [mobileOpen, setMobileOpen] = useState(false)
+
+  useEffect(() => {
+    const update = () => setIsMobile(window.innerWidth <= 768)
+    update()
+    window.addEventListener("resize", update)
+    return () => window.removeEventListener("resize", update)
+  }, [])
 
   return (
-    <main className="relative min-h-screen overflow-hidden pt-28">
+    <main className="relative min-h-screen overflow-hidden pt-24 md:pt-28">
 
-      <header className="fixed inset-x-0 top-0 z-50 px-6 sm:px-10 lg:px-16">
-        <div className="glass-surface flex flex-col gap-6 px-6 py-4 lg:flex-row lg:items-center lg:justify-between">
-          <div>
-            <p className="text-xs uppercase tracking-[0.4em] text-white/60">Orphta</p>
-            <p className="text-sm text-white/70">Fábrica de softwares para times que não podem desacelerar.</p>
+      <header className="fixed inset-x-0 top-0 z-50 px-4 sm:px-8 lg:px-16">
+        <div className="glass-surface flex flex-col gap-2 px-4 py-3 sm:px-6 sm:py-4 lg:flex-row lg:items-center lg:justify-between">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-xs uppercase tracking-[0.4em] text-white/60">Orphta</p>
+            </div>
+            {isMobile && (
+              <button
+                onClick={() => setMobileOpen((prev) => !prev)}
+                className="ml-3 rounded-full border border-white/20 px-3 py-2 text-[11px] font-semibold uppercase tracking-[0.3em] text-white/80"
+              >
+                {mobileOpen ? "Fechar" : "Menu"}
+              </button>
+            )}
           </div>
-          <div className="flex flex-1 items-center justify-center">
-            <PillBase />
-          </div>
-          <RainbowButton onClick={handleScrollToContact} className="whitespace-nowrap">
-            Falar agora
-          </RainbowButton>
+          {!isMobile && (
+            <>
+              <div className="flex flex-1 items-center justify-center">
+                <PillBase />
+              </div>
+              <RainbowButton onClick={handleScrollToContact} className="whitespace-nowrap px-5 py-2 text-sm sm:text-base">
+                Falar agora
+              </RainbowButton>
+            </>
+          )}
+          {isMobile && mobileOpen && (
+            <div className="flex flex-col gap-3 rounded-2xl border border-white/15 bg-black/70 p-3 backdrop-blur-xl">
+              <PillBase />
+              <RainbowButton onClick={() => { setMobileOpen(false); handleScrollToContact() }} className="w-full justify-center px-5 py-3 text-base">
+                Falar agora
+              </RainbowButton>
+            </div>
+          )}
         </div>
       </header>
 
-      <section id="home" className="relative isolate flex min-h-screen flex-col gap-16 px-6 pb-24 pt-8 sm:px-10 lg:px-16 scroll-mt-28">
-        <div className="glass-surface relative overflow-hidden rounded-[40px] p-0">
-          <div className="pointer-events-none absolute inset-0 opacity-60 mix-blend-screen">
+      <section
+        id="home"
+        className="relative isolate flex min-h-[55vh] md:min-h-screen flex-col gap-8 px-6 pb-12 pt-4 sm:px-10 sm:pb-16 sm:pt-6 lg:px-16 scroll-mt-24 md:scroll-mt-28"
+      >
+        <div
+          className={`relative overflow-hidden rounded-[32px] p-0 ${isMobile ? "border border-white/5 bg-transparent" : "glass-surface"}`}
+        >
+          <div className="pointer-events-none absolute inset-0 opacity-50 mix-blend-screen">
             <ShaderAnimation />
           </div>
-          <div className="relative z-10 grid gap-10 p-10 lg:grid-cols-[1.1fr_0.9fr]">
-            <div className="space-y-8 lg:pr-4">
-            <div className="inline-flex items-center gap-3 rounded-full border border-white/20 px-4 py-2 text-xs uppercase tracking-[0.4em] text-white/70">
-              <span className="h-2 w-2 rounded-full bg-emerald-400 shadow-[0_0_12px_3px_rgba(16,185,129,0.45)]"></span>
-              Disponível para novos projetos
-            </div>
-            <h1 className="text-4xl font-semibold leading-tight text-white md:text-6xl">
-              Orphta é a fábrica de softwares que entrega produtos enterprise com estética de futuro e engenharia comprovada.
-            </h1>
-            <p className="text-lg text-white/70 md:w-4/5">
-              Conectamos estratégia, design e engenharia em sprints que alinham diretoria, squads e usuários sem burocracia e sem hiato entre visão e execução.
-            </p>
-            <div className="flex flex-wrap items-center gap-6">
-              <RainbowButton className="rounded-full px-8 text-base font-semibold" onClick={handleScrollToContact}>
-                Começar um projeto
-              </RainbowButton>
-              <button
-                onClick={() => {
-                  document.getElementById("problem")?.scrollIntoView({ behavior: "smooth", block: "start" })
-                }}
-                className="group inline-flex items-center gap-2 text-sm font-semibold text-white/70"
-              >
-                Ver manifesto
-                <ArrowUpRight className="size-4 transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
-              </button>
-            </div>
-            <div className="glass-surface grid gap-4 rounded-3xl p-4 sm:grid-cols-3">
-              {heroMetrics.map((metric) => (
-                <div key={metric.label} className="space-y-1">
-                  <p className="text-3xl font-semibold text-white">{metric.value}</p>
-                  <p className="text-xs uppercase tracking-[0.3em] text-white/50">{metric.label}</p>
-                </div>
-              ))}
-            </div>
-          </div>
-          <div className="grid gap-6">
-            {differentiators.map((item) => (
-              <div key={item.title} className="glass-surface rounded-3xl space-y-3 p-6 text-white">
-                <p className="text-xs uppercase tracking-[0.3em] text-white/60">{item.title}</p>
-                <p className="text-base text-white/80">{item.copy}</p>
+          <div className="relative z-10 grid gap-6 p-5 sm:gap-8 sm:p-8 lg:grid-cols-[1.1fr_0.9fr] lg:p-10">
+            <div className="relative space-y-5 lg:pr-4">
+              {isMobile && (
+                <div className="pointer-events-none absolute -inset-4 -z-10 bg-gradient-to-b from-black/75 via-black/40 to-transparent" />
+              )}
+
+              <div className="inline-flex items-center gap-3 rounded-full border border-white/20 px-4 py-2 text-xs uppercase tracking-[0.4em] text-white/70">
+                <span className="h-2 w-2 rounded-full bg-emerald-400 shadow-[0_0_12px_3px_rgba(16,185,129,0.45)]"></span>
+                Disponível para novos projetos
               </div>
-            ))}
-          </div>
+
+              <h1 className="text-3xl font-semibold leading-tight text-white sm:text-4xl md:text-5xl lg:text-6xl">
+                Orphta é a fábrica de softwares que entrega produtos enterprise com estética de futuro e engenharia comprovada.
+              </h1>
+
+              <p className="text-base text-white/70 sm:text-lg md:w-4/5">
+                {isMobile
+                  ? "Estratégia, design e engenharia na mesma sprint para você lançar rápido e com estética de futuro."
+                  : "Conectamos estratégia, design e engenharia em sprints que alinham diretoria, squads e usuários sem burocracia e sem hiato entre visão e execução."}
+              </p>
+
+              <div className="flex flex-wrap items-center gap-4 sm:gap-6">
+                <RainbowButton className="rounded-full px-8 text-base font-semibold" onClick={handleScrollToContact}>
+                  Começar um projeto
+                </RainbowButton>
+                <button
+                  onClick={() => {
+                    document.getElementById("problem")?.scrollIntoView({ behavior: "smooth", block: "start" })
+                  }}
+                  className="group inline-flex items-center gap-2 text-sm font-semibold text-white/70 sm:flex"
+                >
+                  <span className="hidden sm:inline">Ver manifesto</span>
+                  <ArrowUpRight className="size-4 transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
+                </button>
+              </div>
+
+              <div className="glass-surface hidden grid-cols-2 gap-4 rounded-3xl p-4 sm:grid sm:grid-cols-3">
+                {heroMetrics.map((metric) => (
+                  <div key={metric.label} className="space-y-1">
+                    <p className="text-3xl font-semibold text-white">{metric.value}</p>
+                    <p className="text-xs uppercase tracking-[0.3em] text-white/50">{metric.label}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div className="grid gap-6">
+              {isMobile ? (
+                <div className="flex snap-x gap-3 overflow-x-auto pb-1">
+                  {differentiators.map((item) => (
+                    <div
+                      key={item.title}
+                      className="snap-start shrink-0 rounded-2xl border border-white/10 bg-black/30 px-4 py-4 text-white shadow-[0_10px_30px_rgba(0,0,0,0.4)]"
+                    >
+                      <p className="text-[11px] uppercase tracking-[0.28em] text-white/70">{item.title}</p>
+                      <p className="mt-2 text-sm text-white/80 leading-relaxed">{item.copy}</p>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                differentiators.map((item) => (
+                  <div
+                    key={item.title}
+                    className="glass-surface rounded-3xl space-y-3 p-6 text-white"
+                  >
+                    <p className="text-xs uppercase tracking-[0.3em] text-white/60">{item.title}</p>
+                    <p className="text-base text-white/80">{item.copy}</p>
+                  </div>
+                ))
+              )}
+            </div>
           </div>
         </div>
       </section>
 
-      <section id="problem" className="relative z-10 px-6 pb-24 sm:px-10 lg:px-16 scroll-mt-28">
+      <section id="problem" className="relative z-10 px-6 pb-16 sm:pb-24 sm:px-10 lg:px-16 scroll-mt-24 md:scroll-mt-28">
         <div className="flex flex-col gap-6 md:flex-row md:items-end md:justify-between">
           <div className="space-y-4">
             <ParticleHeading text="O PROBLEMA" fontSize={96} />
@@ -225,7 +291,9 @@ export default function Home() {
           <div className="grid gap-6 md:grid-cols-3">
             {services.map((service) => (
               <article key={service.title} className="glass-surface-transparent relative flex flex-col gap-6 rounded-3xl p-6">
-                <div className="h-12 w-12 rounded-2xl border border-white/20 bg-transparent" />
+                <div className="flex h-12 w-12 items-center justify-center rounded-2xl border border-white/20 bg-white/5 text-white/80 shadow-[0_10px_30px_rgba(0,0,0,0.25)]">
+                  <service.icon className="h-6 w-6" />
+                </div>
                 <div className="space-y-3">
                   <h3 className="text-2xl font-semibold text-white">{service.title}</h3>
                   <p className="text-sm text-white/70">{service.description}</p>
@@ -237,7 +305,7 @@ export default function Home() {
         </div>
       </section>
 
-      <section id="solution" className="relative z-10 px-6 pb-24 sm:px-10 lg:px-16 scroll-mt-28">
+      <section id="solution" className="relative z-10 px-6 pb-16 sm:pb-24 sm:px-10 lg:px-16 scroll-mt-24 md:scroll-mt-28">
         <div className="space-y-6">
           <ParticleHeading text="COMO TRABALHAMOS" fontSize={96} />
           <p className="max-w-3xl text-base text-white/70">
@@ -254,50 +322,48 @@ export default function Home() {
         </div>
       </section>
 
-      <section id="about" className="relative z-10 px-6 pb-24 sm:px-10 lg:px-16 scroll-mt-28">
-        <div className="glass-surface-soft relative text-white overflow-visible rounded-none border-0 bg-transparent">
-          <div className="relative mx-auto flex max-w-6xl flex-col gap-12 px-6 py-20 lg:grid lg:grid-cols-2 lg:items-center lg:py-24">
-            <div className="order-2 flex items-center justify-center lg:order-1">
-              <div className="relative aspect-square w-full max-w-[520px]">
-                <RotatingEarth width={520} height={520} className="relative h-full w-full" />
-              </div>
+      <section id="about" className="relative z-10 px-6 pb-16 sm:pb-24 sm:px-10 lg:px-16 scroll-mt-24 md:scroll-mt-28">
+        <div className="relative mx-auto flex max-w-6xl flex-col gap-10 px-2 py-10 text-white lg:grid lg:grid-cols-2 lg:items-center lg:gap-16 lg:px-6">
+          <div className="order-2 flex items-center justify-center lg:order-1">
+            <div className="relative aspect-square w-full max-w-[520px]">
+              <RotatingEarth width={520} height={520} className="relative h-full w-full" />
             </div>
-            <div className="order-1 space-y-6 lg:order-2 lg:ml-auto lg:max-w-xl">
-              <p className="text-xs font-semibold uppercase tracking-[0.35em] text-emerald-300/80">Fábrica global</p>
-              <h2 className="text-3xl font-semibold leading-tight md:text-4xl lg:text-5xl">
-                Orphta conecta times e produtos digitais ao redor do mundo.
-              </h2>
-              <p className="text-sm text-emerald-50/80 md:text-base">
-                Somos um estúdio-tech baseado em São Paulo com operação distribuída na América Latina e parceiros na Europa. Traduzimos estratégia corporativa em produtos que escalam rápido, com governança viva e estética de futuro.
-              </p>
-              <ul className="space-y-2 text-sm text-emerald-100/80">
-                <li>• Selecionamos poucos projetos por ciclo para garantir imersão total.</li>
-                <li>• Acesso direto ao time core, rituais semanais e dashboards de adoção.</li>
-                <li>• Arquiteturas desenhadas para crescer junto com seu roadmap.</li>
-              </ul>
-              <div className="flex flex-wrap gap-3 pt-4 text-xs uppercase tracking-[0.3em] text-emerald-200/70">
-                {previousWorks.map((work, index) => (
-                  <Link
-                    key={work.label}
-                    href={work.href}
-                    className={`rounded-full border px-4 py-2 ${
-                      index === 0
-                        ? "border-emerald-500/60 bg-emerald-500/10"
-                        : index === 1
-                          ? "border-emerald-500/30 bg-emerald-500/5"
-                          : "border-emerald-500/20"
-                    }`}
-                  >
-                    {work.label}
-                  </Link>
-                ))}
-              </div>
+          </div>
+          <div className="order-1 space-y-5 lg:order-2 lg:ml-auto lg:max-w-xl">
+            <p className="text-xs font-semibold uppercase tracking-[0.35em] text-emerald-300/80">Fábrica global</p>
+            <h2 className="text-3xl font-semibold leading-tight text-white md:text-4xl lg:text-5xl">
+              Orphta conecta times e produtos digitais ao redor do mundo.
+            </h2>
+            <p className="text-sm text-white/80 md:text-base">
+              Operação distribuída nas Américas e Europa, entregando produtos que já nascem prontos para escalar com governança viva e estética de futuro.
+            </p>
+            <ul className="space-y-2 text-sm text-white/75">
+              <li>• Selecionamos poucos projetos por ciclo para garantir imersão total.</li>
+              <li>• Acesso direto ao time core, rituais semanais e dashboards de adoção.</li>
+              <li>• Arquiteturas desenhadas para crescer junto com seu roadmap.</li>
+            </ul>
+            <div className="flex flex-wrap gap-3 pt-3 text-xs uppercase tracking-[0.3em] text-emerald-200/70">
+              {previousWorks.map((work, index) => (
+                <Link
+                  key={work.label}
+                  href={work.href}
+                  className={`rounded-full border px-4 py-2 ${
+                    index === 0
+                      ? "border-emerald-500/60 bg-emerald-500/10"
+                      : index === 1
+                        ? "border-emerald-500/30 bg-emerald-500/5"
+                        : "border-emerald-500/20"
+                  }`}
+                >
+                  {work.label}
+                </Link>
+              ))}
             </div>
           </div>
         </div>
       </section>
 
-      <section id="contact" className="relative z-10 px-6 pb-24 sm:px-10 lg:px-16 scroll-mt-28">
+      <section id="contact" className="relative z-10 px-6 pb-16 sm:pb-24 sm:px-10 lg:px-16 scroll-mt-24 md:scroll-mt-28">
         <div className="space-y-4">
           <ParticleHeading text="CONTATO" fontSize={96} />
           <p className="max-w-xl text-base text-white/70">

@@ -37,11 +37,27 @@ export function TextParticle({
   const [particles, setParticles] = useState<Particle[]>([])
   const [mouse, setMouse] = useState<{ x: number | null; y: number | null }>({ x: null, y: null })
   const animationRef = useRef<number | null>(null)
+  const lastFrameRef = useRef(0)
+  const [shouldAnimate, setShouldAnimate] = useState(true)
+
+  useEffect(() => {
+    if (typeof window === "undefined") return
+    const reduceMq = window.matchMedia("(prefers-reduced-motion: reduce)")
+    const mobileMq = window.matchMedia("(max-width: 768px)")
+    const update = () => setShouldAnimate(!reduceMq.matches && !mobileMq.matches)
+    update()
+    reduceMq.addEventListener("change", update)
+    mobileMq.addEventListener("change", update)
+    return () => {
+      reduceMq.removeEventListener("change", update)
+      mobileMq.removeEventListener("change", update)
+    }
+  }, [])
 
   useEffect(() => {
     const canvas = canvasRef.current
     if (!canvas) return
-    const ctx = canvas.getContext("2d")
+    const ctx = canvas.getContext("2d", { willReadFrequently: true } as CanvasRenderingContext2DSettings)
     if (!ctx) return
 
     const handleResize = () => {
@@ -101,8 +117,28 @@ export function TextParticle({
     if (!canvas) return
     const ctx = canvas.getContext("2d")
     if (!ctx) return
+    if (!shouldAnimate) {
+      ctx.clearRect(0, 0, canvas.width, canvas.height)
+      particles.forEach((particle) => {
+        ctx.beginPath()
+        ctx.arc(particle.x, particle.y, particle.size, 0, Math.PI * 2)
+        ctx.fillStyle = particle.color
+        ctx.fill()
+      })
+      return
+    }
+
+    lastFrameRef.current = 0
 
     const animate = () => {
+      // throttle to ~30fps to lower CPU usage on mobile devices
+      const now = performance.now()
+      if (now - lastFrameRef.current < 33) {
+        animationRef.current = requestAnimationFrame(animate)
+        return
+      }
+      lastFrameRef.current = now
+
       ctx.clearRect(0, 0, canvas.width, canvas.height)
       if (backgroundColor !== "transparent") {
         ctx.fillStyle = backgroundColor
@@ -144,7 +180,7 @@ export function TextParticle({
     return () => {
       if (animationRef.current) cancelAnimationFrame(animationRef.current)
     }
-  }, [particles, mouse, backgroundColor])
+  }, [particles, mouse, backgroundColor, shouldAnimate])
 
   const handleMouseMove = (e: React.MouseEvent<HTMLCanvasElement>) => {
     const canvas = canvasRef.current
@@ -163,4 +199,3 @@ export function TextParticle({
     />
   )
 }
-

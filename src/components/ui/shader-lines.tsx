@@ -1,7 +1,7 @@
 "use client"
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { useEffect, useRef } from "react"
+import { useEffect, useRef, useState } from "react"
 
 declare global {
   interface Window {
@@ -11,6 +11,7 @@ declare global {
 
 export function ShaderAnimation() {
   const containerRef = useRef<HTMLDivElement>(null)
+  const [enabled, setEnabled] = useState(false)
   const sceneRef = useRef<{
     camera: any | null
     scene: any | null
@@ -31,26 +32,47 @@ export function ShaderAnimation() {
   })
 
   useEffect(() => {
-    const script = document.createElement("script")
-    script.src = "https://cdnjs.cloudflare.com/ajax/libs/three.js/89/three.min.js"
-    script.onload = () => {
+    if (typeof window === "undefined") return
+    const mobileMq = window.matchMedia("(max-width: 768px)")
+    const reduceMq = window.matchMedia("(prefers-reduced-motion: reduce)")
+    const update = () => setEnabled(!(mobileMq.matches || reduceMq.matches))
+    update()
+    mobileMq.addEventListener("change", update)
+    reduceMq.addEventListener("change", update)
+    return () => {
+      mobileMq.removeEventListener("change", update)
+      reduceMq.removeEventListener("change", update)
+    }
+  }, [])
+
+  useEffect(() => {
+    if (!enabled) return
+    let script: HTMLScriptElement | null = null
+    let cleanup: (() => void) | undefined
+
+    const start = () => {
       if (containerRef.current && window.THREE) {
-        initThreeJS()
+        cleanup = initThreeJS()
       }
     }
-    document.head.appendChild(script)
+
+    if (window.THREE) {
+      start()
+    } else {
+      script = document.createElement("script")
+      script.src = "https://cdnjs.cloudflare.com/ajax/libs/three.js/89/three.min.js"
+      script.onload = start
+      document.head.appendChild(script)
+    }
 
     return () => {
-      if (sceneRef.current.animationId) {
-        cancelAnimationFrame(sceneRef.current.animationId)
+      if (cleanup) cleanup()
+      if (script && document.head.contains(script)) {
+        document.head.removeChild(script)
       }
-      if (sceneRef.current.renderer) {
-        sceneRef.current.renderer.dispose()
-      }
-      document.head.removeChild(script)
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
+  }, [enabled])
 
   const initThreeJS = () => {
     if (!containerRef.current || !window.THREE) return
@@ -129,7 +151,7 @@ export function ShaderAnimation() {
     scene.add(mesh)
 
     const renderer = new THREE.WebGLRenderer()
-    renderer.setPixelRatio(window.devicePixelRatio)
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio ?? 1, 1.5))
     container.appendChild(renderer.domElement)
 
     sceneRef.current = {
@@ -142,7 +164,9 @@ export function ShaderAnimation() {
 
     const onWindowResize = () => {
       const rect = container.getBoundingClientRect()
-      renderer.setSize(rect.width, rect.height)
+      const width = rect.width || 1
+      const height = rect.height || 1
+      renderer.setSize(width, height)
       uniforms.resolution.value.x = renderer.domElement.width
       uniforms.resolution.value.y = renderer.domElement.height
     }
@@ -157,6 +181,21 @@ export function ShaderAnimation() {
     }
 
     animate()
+
+    return () => {
+      if (sceneRef.current.animationId) cancelAnimationFrame(sceneRef.current.animationId)
+      window.removeEventListener("resize", onWindowResize)
+      renderer.dispose()
+    }
+  }
+
+  if (!enabled) {
+    return (
+      <div
+        ref={containerRef}
+        className="absolute inset-0 h-full w-full bg-[radial-gradient(circle_at_30%_20%,rgba(59,130,246,0.2),transparent_45%),radial-gradient(circle_at_70%_30%,rgba(16,185,129,0.18),transparent_40%),linear-gradient(135deg,rgba(0,0,0,0.35),rgba(0,0,0,0.6))]"
+      />
+    )
   }
 
   return <div ref={containerRef} className="absolute inset-0 h-full w-full" />
